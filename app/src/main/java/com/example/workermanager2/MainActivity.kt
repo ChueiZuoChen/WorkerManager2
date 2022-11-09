@@ -1,5 +1,6 @@
 package com.example.workermanager2
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -23,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WorkerManager2Theme {
-                HomeView(modifier = Modifier.fillMaxSize(), applicationContext)
+                HomeView(modifier = Modifier.fillMaxSize(), LocalLifecycleOwner.current,applicationContext)
             }
         }
     }
@@ -32,18 +36,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeView(
     modifier: Modifier = Modifier,
-    applicationContext: Context
+    applicationContext: LifecycleOwner,
+    context: Context
 ) {
     Button(onClick = {
         val work1 = OneTimeWorkRequestBuilder<Worker1>().setInputData(workDataOf("seconds" to 5)).build()
         val work2 = OneTimeWorkRequestBuilder<Worker2>().setInputData(workDataOf("seconds" to 10)).build()
         val work3 = OneTimeWorkRequestBuilder<Worker3>().setInputData(workDataOf("seconds" to 15)).build()
 
-        val wm1 = WorkManager.getInstance(applicationContext)
+        WorkManager.getInstance(context)
             .beginWith(listOf(work1,work2))
             .then(work3)
             .enqueue()
-        Log.d("worker111", "wm1: ${wm1.result}")
+
+        val id = WorkManager.getInstance(context).getWorkInfoByIdLiveData(work3.id)
+        id.observe(applicationContext, Observer {
+            Log.d("worker111", "result: ${it.outputData}")
+        })
+
+
 
     }) {
         Text(text = "Start")
