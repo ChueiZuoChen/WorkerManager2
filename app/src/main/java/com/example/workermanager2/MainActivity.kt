@@ -2,6 +2,7 @@ package com.example.workermanager2
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,18 +43,7 @@ fun HomeView(
             .beginWith(listOf(work1,work2))
             .then(work3)
             .enqueue()
-//        val wm2 = WorkManager.getInstance(applicationContext)
-//            .enqueueUniqueWork(
-//                "worker-2",
-//                ExistingWorkPolicy.REPLACE,
-//                work2
-//            )
-//
-//        val combine=WorkContinuation
-//            .combine(Arrays.asList(wm1,wm2))
-//            .then(work3)
-
-
+        Log.d("worker111", "wm1: ${wm1.result}")
 
     }) {
         Text(text = "Start")
